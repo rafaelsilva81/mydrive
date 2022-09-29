@@ -9,6 +9,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ReferenceContainer } from '../components/ReferenceContainer';
 import { Plus } from 'phosphor-react'
 import { UploadContextMenu } from '../components/menus/UploadContextMenu';
+import { NewFile } from '../components/modals/NewFile';
+import { NewFolder } from '../components/modals/NewFolder';
+
 export const Dashboard = () => {
 
   const [items, setItems] = useState<StorageReference[]>([]);
@@ -19,7 +22,7 @@ export const Dashboard = () => {
   });
 
   const storage = useStorage();
-  const listRef = storageRef(storage, signInCheckResult.user?.uid);
+  const listRef = storageRef(storage, signInCheckResult.user?.uid); /* will create new folder if not exists */
 
   const fetchItems = async () => {
     const { items, prefixes } = await listAll(listRef);
@@ -36,6 +39,9 @@ export const Dashboard = () => {
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [showUploadMenu, setShowUploadMenu] = useState(false);
 
+  const [showNewFile, setShowNewFile] = useState(false);
+  const [showNewFolder, setShowNewFolder] = useState(false);
+
   const openUploadMenu = useCallback((event: any) => {
     event.preventDefault()
     if (buttonLocation.current) {
@@ -43,8 +49,8 @@ export const Dashboard = () => {
       /* set on top left of btn */
       setAnchorPoint({ x: rect.left - 3 * rect.width, y: rect.top - rect.height });
       /* setAnchorPoint({ x: buttonLocation.current.offsetLeft - 3 * buttonLocation.current.offsetWidth, y: buttonLocation.current.offsetTop - buttonLocation.current.offsetHeight }) */
-      setShowUploadMenu(true)
     }
+    setShowUploadMenu(true);
   }, [setAnchorPoint, setShowUploadMenu])
 
   /* close upload menu when clicking anywhere else on screen */
@@ -73,7 +79,9 @@ export const Dashboard = () => {
             return <ReferenceContainer type='prefix' target={prefix} key={prefix.fullPath} />
           })}
           {items.map((item) => {
-            return <ReferenceContainer type='item' target={item} key={item.fullPath} />
+            if (item.name != '.exists') {
+              return <ReferenceContainer type='item' target={item} key={item.fullPath} />
+            }
           })}
         </div>
 
@@ -89,11 +97,14 @@ export const Dashboard = () => {
           showUploadMenu ? (
             <UploadContextMenu
               anchor={anchorPoint}
-              onNewFolder={() => { alert('new folder') }}
-              onUpload={() => { }}
+              onNewFolder={() => { setShowNewFolder(true)}}
+              onUpload={() => { setShowNewFile(true) }}
             />
           ) : null
         }
+    
+        {/* <NewFile show={showNewFile}/> */}
+        <NewFolder show={showNewFolder} basePath={listRef}/>
       </div>
     )
   } else {
