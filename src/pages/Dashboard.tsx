@@ -1,5 +1,5 @@
-import { listAll, ref as storageRef, StorageReference } from 'firebase/storage';
-import { DetailedHTMLProps, ReactElement, RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { listAll, ref as storageRef, StorageReference, uploadBytesResumable } from 'firebase/storage';
+import { ChangeEvent, DetailedHTMLProps, ReactElement, RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSigninCheck, useStorage } from 'reactfire';
 import { Navbar } from '../components/Navbar';
@@ -39,8 +39,8 @@ export const Dashboard = () => {
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const [showUploadMenu, setShowUploadMenu] = useState(false);
 
-  const [showNewFile, setShowNewFile] = useState(false);
   const [showNewFolder, setShowNewFolder] = useState(false);
+  const uploadInput = useRef<HTMLInputElement>(null);
 
   const openUploadMenu = useCallback((event: any) => {
     event.preventDefault()
@@ -67,9 +67,24 @@ export const Dashboard = () => {
     }
   }, [setShowUploadMenu])
 
+  /* upload */
+  const handleFileChange = (event: ChangeEvent) => {
+    const file = (event.target as HTMLInputElement).files?.item(0);
+    if (file) {
+      const ref = storageRef(storage, signInCheckResult.user?.uid + '/' + file.name)
+      uploadBytesResumable(ref, file).then((snapshot) => {
+        console.log('Uploaded a blob or file!');
+      }).catch((error) => {
+        console.log(error)
+      });
+
+    }
+  }
+
   if (signInCheckResult.signedIn) {
     return (
       <div>
+        <input type="file" name="file" onChange={handleFileChange} ref={uploadInput} hidden={true} />
         <ToastContainer />
         <Navbar />
         {items.length === 0 && prefixes.length === 0 && <NoFiles />}
@@ -97,14 +112,14 @@ export const Dashboard = () => {
           showUploadMenu ? (
             <UploadContextMenu
               anchor={anchorPoint}
-              onNewFolder={() => { setShowNewFolder(true)}}
-              onUpload={() => { setShowNewFile(true) }}
+              onNewFolder={() => { setShowNewFolder(true) }}
+              onUpload={() => { uploadInput.current?.click() }}
             />
           ) : null
         }
-    
+
         {/* <NewFile show={showNewFile}/> */}
-        <NewFolder show={showNewFolder} basePath={listRef}/>
+        <NewFolder show={showNewFolder} basePath={listRef} />
       </div>
     )
   } else {
