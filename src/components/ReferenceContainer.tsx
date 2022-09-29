@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { deleteObject, StorageReference } from 'firebase/storage'
-import { ReactElement, useCallback, useEffect, useState } from 'react'
+import { FormEvent, ReactElement, useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 import ReactTooltip from 'react-tooltip';
 import { useStorageDownloadURL } from 'reactfire';
@@ -10,6 +10,7 @@ import { FolderThumbnail } from './thumbnails/FolderThumbnail';
 import { ImageThumbnail } from './thumbnails/ImageThumbnail';
 import { ReferenceContextMenu } from './menus/ReferenceContextMenu';
 import fileDownload from 'js-file-download'
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     target: StorageReference
@@ -19,6 +20,8 @@ interface Props {
 const imageExtensions = ['image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/svg', 'image/webp'];
 
 export const ReferenceContainer = (props: Props) => {
+
+    const navigate = useNavigate();
 
     const [thumbnail, setThumbnail] = useState<ReactElement>(<FileSkeleton />);
 
@@ -120,10 +123,19 @@ export const ReferenceContainer = (props: Props) => {
         }
     }
 
+    const handleClick = (event: FormEvent) => {
+        event.preventDefault();
+        if (type === 'item') {
+            /* downloadTarget(); */
+        } else if (type === 'prefix') {
+            navigate(encodeURIComponent(target.name));
+        }
+    }
+
 
     return (
         <>
-            <div className="flex m-2 rounded-lg overflow-hidden flex-col max-w-[48vw] hover:opacity-80" onContextMenu={openMenu}>
+            <div className="flex m-2 rounded-lg overflow-hidden flex-col max-w-[48vw] hover:opacity-80" onContextMenu={openMenu} onClick={handleClick}>
                 <a href="">
                     <div id="thumbnail" className="w-48">
                         {type === 'prefix' ? (<FolderThumbnail />) : thumbnail}

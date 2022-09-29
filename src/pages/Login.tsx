@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useSigninCheck } from 'reactfire';
+import { useEffect } from 'react';
 
 const authSchema = yup.object().shape({
     email: yup.string().email('Please enter a valid mail').required('E-mail is required'),
@@ -23,9 +24,12 @@ export const Login = () => {
     const { user } = signInCheckResult || {};
     const navigate = useNavigate();
 
-    if (user) {
-        navigate('/')
-    }
+    useEffect(() => {
+        if (user) {
+            navigate('/workspace');
+        }
+    }, [user, navigate]);
+
 
     const { register, handleSubmit, formState: { errors }, setError } = useForm<User>(
         {

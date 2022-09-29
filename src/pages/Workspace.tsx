@@ -1,6 +1,6 @@
-import { listAll, ref as storageRef, StorageReference, uploadBytesResumable } from 'firebase/storage';
+import { listAll, ref as storageRef, StorageReference, uploadBytes, uploadBytesResumable } from 'firebase/storage';
 import { ChangeEvent, DetailedHTMLProps, ReactElement, RefObject, useCallback, useEffect, useRef, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { useSigninCheck, useStorage } from 'reactfire';
 import { Navbar } from '../components/Navbar';
 import { NoFiles } from '../components/common/NoFiles';
@@ -12,17 +12,30 @@ import { UploadContextMenu } from '../components/menus/UploadContextMenu';
 import { NewFile } from '../components/modals/NewFile';
 import { NewFolder } from '../components/modals/NewFolder';
 
-export const Dashboard = () => {
+
+export const Workspace = () => {
+
+  let { folderId } = useParams();
 
   const [items, setItems] = useState<StorageReference[]>([]);
   const [prefixes, setPrefixes] = useState<StorageReference[]>([]);
+
 
   const { status, data: signInCheckResult } = useSigninCheck({
     suspense: true
   });
 
   const storage = useStorage();
-  const listRef = storageRef(storage, signInCheckResult.user?.uid); /* will create new folder if not exists */
+  if (folderId) {
+    folderId = decodeURIComponent(folderId);
+    /* reference should point to this folder */
+  }
+
+  let listRef = storageRef(storage, signInCheckResult.user?.uid); /* will create new folder if not exists */
+  /* append folderId to ref (if its defined) */
+  if (folderId) {
+    listRef = storageRef(listRef, folderId);
+  }
 
   const fetchItems = async () => {
     const { items, prefixes } = await listAll(listRef);
@@ -118,8 +131,21 @@ export const Dashboard = () => {
           ) : null
         }
 
-        {/* <NewFile show={showNewFile}/> */}
-        <NewFolder show={showNewFolder} basePath={listRef} />
+        {
+          showNewFolder ? (
+            <NewFolder
+              onClose={() => { setShowNewFolder(false) }}
+              onCreate={async (name) => {
+                const ref = storageRef(storage, listRef + '/' + name + '/' + '.exists')
+                const file = new Blob(['.exists'])
+                await uploadBytes(ref, file)
+                setShowNewFolder(false)
+              }}
+            />
+          ) : null
+        }
+
+        {/* <NewFolder show={showNewFolder} basePath={listRef} /> */}
       </div>
     )
   } else {

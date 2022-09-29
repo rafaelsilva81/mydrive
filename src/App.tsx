@@ -3,7 +3,7 @@ import { AuthProvider, StorageProvider, useFirebaseApp } from 'reactfire';
 import { Route, Routes } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
-import { Dashboard } from './pages/Dashboard';
+import { Workspace } from './pages/Workspace';
 import { Login } from './pages/Login';
 
 function App() {
@@ -15,13 +15,16 @@ function App() {
     <StorageProvider sdk={storage}>
       <AuthProvider sdk={auth}>
         <Routes>
-          <Route path='/'>
-            <Route index element={<Dashboard />} />
-            <Route
-              path='login'
-              element={<Login />}
-            />
+          <Route path="/" element={<Login />} />
+
+          <Route path="/workspace">
+            <Route index element={<Workspace />} />
+            <Route path="/workspace/:folderId" element={<Workspace />} />
           </Route>
+          <Route
+            path='login'
+            element={<Login />}
+          />
         </Routes>
       </AuthProvider>
     </StorageProvider>
