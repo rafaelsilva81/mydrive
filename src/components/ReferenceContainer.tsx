@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { deleteObject, StorageReference } from 'firebase/storage'
+import { deleteObject, listAll, StorageReference } from 'firebase/storage'
 import { FormEvent, ReactElement, useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 import ReactTooltip from 'react-tooltip';
@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 interface Props {
     target: StorageReference
     type: 'item' | 'prefix'
+    onDelete:  (target: StorageReference, type: string) => void;
 }
 
 const imageExtensions = ['image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/svg', 'image/webp'];
@@ -25,7 +26,7 @@ export const ReferenceContainer = (props: Props) => {
 
     const [thumbnail, setThumbnail] = useState<ReactElement>(<FileSkeleton />);
 
-    const { target, type } = props
+    const { target, type, onDelete } = props
 
     const [downloadBlob, setDownloadBlob] = useState<Blob | null>(null);
 
@@ -46,7 +47,6 @@ export const ReferenceContainer = (props: Props) => {
                 });
                 setDownloadBlob(response.data);
                 const mimeType = response.headers['content-type'];
-                console.log(mimeType)
                 if (imageExtensions.includes(mimeType)) {
                     setThumbnail(<ImageThumbnail url={itemURL} />);
                 } else {
@@ -88,59 +88,25 @@ export const ReferenceContainer = (props: Props) => {
         }
     }
 
-    const deleteTarget = () => {
-        /* ask confirmation to the user */
-        const confirmation = window.confirm(`Are you sure you want to delete ${name}?`)
-        if (confirmation && target) {
-            /* Delete target */
-            deleteObject(target).then(() => {
-                toast("File deleted successfully", {
-                    type: "success",
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: true,
-                    progress: undefined,
-                    style: {}
-                });
-                console.log("deleted")
-            }).catch((error) => {
-                toast("Error deleting file", {
-                    type: "error",
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: true,
-                    progress: undefined,
-                });
-                console.log(error)
-            })
-
-        }
-    }
-
     const handleClick = (event: FormEvent) => {
         event.preventDefault();
         if (type === 'item') {
-            /* downloadTarget(); */
+            console.log(encodeURIComponent(downloadData.data))
         } else if (type === 'prefix') {
-            navigate(encodeURIComponent(target.name));
+            /* go to /workspace/:folderId */
+            navigate(`/workspace/${target.fullPath}`)
         }
     }
 
 
     return (
         <>
-            <div className="flex m-2 rounded-lg overflow-hidden flex-col max-w-[48vw] hover:opacity-80" onContextMenu={openMenu} onClick={handleClick}>
+            <div className="flex m-2 rounded-lg overflow-hidden flex-col hover:opacity-80" onContextMenu={openMenu} onClick={handleClick}>
                 <a href="">
-                    <div id="thumbnail" className="w-48">
+                    <div id="thumbnail" className="w-36">
                         {type === 'prefix' ? (<FolderThumbnail />) : thumbnail}
                     </div>
-                    <div className="p-4 bg-teal-500 hover:bg-teal-400 w-48" data-tip={target.name}>
+                    <div className="p-4 bg-teal-500 hover:bg-teal-400 w-36" data-tip={target.name}>
                         <ReactTooltip delayShow={1000} />
                         <p className="truncate text-neutral-100">{target.name}</p>
                     </div>
@@ -154,7 +120,7 @@ export const ReferenceContainer = (props: Props) => {
                         anchor={anchorPoint}
                         url={downloadData.data}
                         name={target.name}
-                        onDelete={deleteTarget}
+                        onDelete={() => onDelete(target, type)}
                         onDownload={downloadTarget}
                     />
                 ) : null
