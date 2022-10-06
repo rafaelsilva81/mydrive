@@ -46,7 +46,7 @@ export const UploadWidget = (props: Props) => {
 
     return (
         <div className="fixed bottom-0 right-0 m-10" ref={buttonLocation} id="uploadButton">
-            <input type="file" name="file" onChange={onUpload} ref={uploadInput} hidden={true} />
+            <input type="file" name="file" multiple onChange={onUpload} ref={uploadInput} hidden={true} />
             {/* round button */}
             <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold p-3 rounded-full" onClick={openUploadMenu} >
                 <Plus size={28} />
