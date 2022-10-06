@@ -11,6 +11,8 @@ import { UploadWidget } from '../components/UploadWidget';
 import { Breadcumb } from '../components/Breadcumb';
 import { Loadable, Barloader } from '../components/common/Loading';
 import ForbiddenError from './errors/ForbiddenError';
+import { confirmAlert } from 'react-confirm-alert';
+import { DeleteConfirmation } from '../components/modals/DeleteConfirmation';
 
 const WorkspaceView = Loadable(lazy(() => import('./WorkspaceView')), Barloader);
 
@@ -79,6 +81,7 @@ export const Workspace = () => {
     }).catch((error) => {
       toast.error(error.message);
     });
+    toast.success('Folder deleted successfully');
   }
 
   const deleteFile = (target: StorageReference) => {
@@ -86,20 +89,23 @@ export const Workspace = () => {
       toast.error(error.message);
     });
     setItems(items?.filter(item => item.fullPath !== target.fullPath));
+    toast.success('File deleted successfully');
   }
 
+
   const handleDelete = (target: StorageReference, type: string) => {
-    /* ask confirmation to the user */
-    const confirmation = window.confirm(`Are you sure you want to delete ${target.name}?`)
-    if (confirmation && target) {
-      if (type === 'prefix') {
-        deleteFolder(target);
-      } else {
-        deleteFile(target);
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <DeleteConfirmation type={type === 'item' ? 'file' : 'prefix'} onClose={onClose} onConfirm={() => {
+            type === 'folder' ? deleteFolder(target) : deleteFile(target);
+            onClose();
+          }} />
+        );
       }
-      toast.success(`Successfully deleted ${target.name}`)
-    }
+    });
   }
+
 
 
   /* handle upload */

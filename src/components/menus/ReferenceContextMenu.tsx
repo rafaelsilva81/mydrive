@@ -38,10 +38,6 @@ export const ReferenceContextMenu = (props: Props) => {
 
                 {/* Action buttons */}
                 <div className='mx-1'>
-                    <MenuActionButton>
-                        <Eye />
-                        <p className="text-sm ml-1">Open</p>
-                    </MenuActionButton>
                     <MenuActionButton onClick={onDelete}>
                         <TrashSimple />
                         <p className="text-sm ml-1">Delete</p>
