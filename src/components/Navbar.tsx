@@ -3,7 +3,10 @@ import { MagnifyingGlass, List, Cloud } from 'phosphor-react'
 import { getAuth, signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
-export const Navbar = () => {
+export const Navbar = (props: { onSearch: (val: string) => void }) => {
+
+    const { onSearch } = props;
+
     const auth = getAuth();
     const navigate = useNavigate();
 
@@ -15,6 +18,7 @@ export const Navbar = () => {
             console.log('logoff error', error);
         });
     }
+
     return (
         <div id="navbar" className="grid grid-cols-12 justify-between p-2 items-center bg-neutral-100">
 
@@ -28,7 +32,10 @@ export const Navbar = () => {
 
             <div id="search" className="flex items-center col-span-6 relative">
                 <MagnifyingGlass size="20" className="absolute ml-2" />
-                <input type="text" name="search" className="w-full h-10 rounded-md border-2 py-2 pl-8 pr-4 border-neutral-200" placeholder="Search" />
+                <input type="text" name="search"
+                    className="w-full h-10 rounded-md border-2 py-2 pl-8 pr-4 border-neutral-200"
+                    placeholder="Search"
+                    onChange={(e) => onSearch(e.target.value)} />
             </div>
 
             <div id="logout" className="flex justify-end items-center col-span-3 mr-8">
