@@ -25,7 +25,7 @@ export const Breadcumb = (props: { path: string }) => {
                     if (index != 0) { /* to not print home */
                         return (
                             <>
-                                <button onClick={() => navigate(path)} className="text-teal-500 hover:text-teal-600 disabled:text-gray-500" disabled={currentLocation === location}>
+                                <button key={index} onClick={() => navigate(path)} className="text-teal-500 hover:text-teal-600 disabled:text-gray-500" disabled={currentLocation === location}>
                                     {location}
                                 </button>
                                 <span className="text-gray-600">/</span>
