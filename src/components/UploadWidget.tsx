@@ -7,27 +7,25 @@ import { NewFolder } from './modals/NewFolder';
 
 interface Props {
     onUpload: (e: ChangeEvent) => void
-    onNewFolder: (name: string) => void
-    showContextMenu: boolean
-    showNewFolderMenu: boolean
+    onNewFolder: (name: string) => Promise<void>
 }
 
 export const UploadWidget = (props: Props) => {
 
-    const {onUpload, onNewFolder, showContextMenu, showNewFolderMenu} = props;
+    const { onUpload, onNewFolder } = props;
 
     const buttonLocation = useRef<HTMLDivElement>(null);
     const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
 
-    const [showUploadMenu, setShowUploadMenu] = useState(showContextMenu);
-    const [showNewFolder, setShowNewFolder] = useState(showNewFolderMenu);
+    const [showUploadMenu, setShowUploadMenu] = useState(false);
+    const [showNewFolder, setShowNewFolder] = useState(false);
 
     const uploadInput = useRef<HTMLInputElement>(null);
 
     const openUploadMenu = useCallback((event: any) => {
         event.preventDefault()
         if (buttonLocation.current) {
-            setAnchorPoint({ x: buttonLocation.current.offsetWidth , y: buttonLocation.current.offsetHeight }) 
+            setAnchorPoint({ x: buttonLocation.current.offsetWidth, y: buttonLocation.current.offsetHeight })
         }
         setShowUploadMenu(true);
     }, [setAnchorPoint, setShowUploadMenu])

@@ -6,7 +6,7 @@ import { useStorage, useStorageTask } from 'reactfire';
 
 interface Props {
     onClose: () => void;
-    onCreate: (name: string) => void;
+    onCreate: (name: string) => Promise<void>;
 }
 
 interface Folder {
@@ -30,10 +30,22 @@ export const NewFolder = (props: Props) => {
 
     const onSubmit = async (data: Folder) => {
         setLoading(true);
-        await onCreate(data.name);
-        setLoading(false);
-    }
 
+        if (data.name === '') {
+            setError('name', { type: "server", message: "Folder name is required" });
+            setLoading(false);
+            return;
+        }
+
+        onCreate(data.name).then(() => {
+            setLoading(false);
+            onClose();
+        }).catch((err) => {
+            setLoading(false);
+            setError('name', { type: "server", message: err.message })
+        })
+
+    }
     return (
         <>
             <div
@@ -56,7 +68,8 @@ export const NewFolder = (props: Props) => {
                                 {/* input for folder name */}
                                 <div className="relative w-full flex flex-col">
                                     <label htmlFor='name' className="text-slate-500 text-sm font-semibold mb-2">Folder Name</label>
-                                    <input type="text" className="p-3 rounded-md shadow-md bg-neutral-100" disabled={loading} placeholder='Enter folder name' {...register('name')} />
+                                    <input type="text" className="p-3 rounded-md shadow-md bg-neutral-100" disabled={loading} required placeholder='Enter folder name' {...register('name')} />
+                                    {errors.name ? <span className="text-red-600 mt-2">{errors.name.message}</span> : null}
                                 </div>
 
                             </div>

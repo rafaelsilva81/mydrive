@@ -101,36 +101,39 @@ export const Workspace = () => {
     }
   }
 
-  const [showContextMenu, setShowContextMenu] = useState(false);
-  const [showNewFolder, setShowNewFolder] = useState(false);
+
   /* handle upload */
   const handleUpload = (event: ChangeEvent) => {
     const file = (event.target as HTMLInputElement).files?.item(0);
     if (file) {
-        const ref = storageRef(storage, path + '/' + file.name)
-        uploadBytesResumable(ref, file).then((snapshot) => {
-            console.log('Uploaded a blob or file!');
-            setItems([...items, ref]);
-        }).catch((error) => {
-            console.log(error)
-        });
-        
+      const ref = storageRef(storage, path + '/' + file.name)
+      uploadBytesResumable(ref, file).then((snapshot) => {
+        console.log('Uploaded a blob or file!');
+        setItems([...items, ref]);
+      }).catch((error) => {
+        console.log(error)
+      });
     }
-    setShowContextMenu(false);
   }
 
   /* handlle new folder */
-  const handleNewFolder  = async (name: string) => {
+  const handleNewFolder = async (name: string) => {
     const ref = storageRef(storage, path + '/' + name + '/' + '.exists')
-    const file = new Blob(['.exists'])
-    uploadBytes(ref, file).then((snapshot) => {
-       const folderRef = storageRef(storage, path + '/' + name)
-       setPrefixes([...prefixes, folderRef]);
-    }).catch((error) => {
-      console.log(error)
-    });
-    setShowNewFolder(false);
-    setShowContextMenu(false);
+    const folderRef = storageRef(storage, path + '/' + name)
+    /* Check if folder exists in list of prefixes */
+    const exists = prefixes?.find(prefix => prefix.name === name);
+
+    if (!exists) {
+      const file = new Blob(['.exists'])
+      uploadBytes(ref, file).then((snapshot) => {
+        setPrefixes([...prefixes, folderRef]);
+        return
+      }).catch((error) => {
+        throw new Error(error.message);
+      });
+    } else {
+      throw new Error('Folder already exists');
+    }
   }
 
   if (signInCheckResult.signedIn) {
@@ -142,7 +145,7 @@ export const Workspace = () => {
         <WorkspaceView path={path} items={items} prefixes={prefixes} onDelete={handleDelete} />
 
         {/* upload button positioned at bottom-right */}
-        <UploadWidget onUpload={handleUpload} onNewFolder={handleNewFolder} showContextMenu={showContextMenu} showNewFolderMenu={showNewFolder}/>
+        <UploadWidget onUpload={handleUpload} onNewFolder={handleNewFolder} />
         {/* <NewFolder show={showNewFolder} basePath={listRef} /> */}
       </div>
     )
