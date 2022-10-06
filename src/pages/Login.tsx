@@ -46,7 +46,7 @@ export const Login = () => {
     const onSubmit = (data: User) => {
         signInWithEmailAndPassword(auth, data.email, data.password)
             .then((userCredential) => {
-                navigate('/home');
+                navigate('/workspace');
                 return true
             }).catch(async (err) => {
                 console.log('err', err);
