@@ -35,9 +35,6 @@ export const Workspace = () => {
   let listRef: StorageReference;
   listRef = storageRef(storage, path);
 
-
-  console.log(items)
-
   /* handle search */
   const [search, setSearch] = useState('');
   const handleSearch = (val: string) => {
@@ -52,7 +49,7 @@ export const Workspace = () => {
   }
 
   useEffect(() => {
-    console.log('updated')
+    /* console.log('updated') */
     fetchItems().then(({ i, p }) => {
       if (search.length > 0) {
         const regex = new RegExp(search, 'i');
@@ -71,7 +68,7 @@ export const Workspace = () => {
   const deleteFolder = (target: StorageReference) => {
     /* list all files and prefixes inside the folder to recursively delete */
     listAll(target).then((res) => {
-      console.log(res)
+      /*  console.log(res) */
       res.items.forEach((itemRef) => {
         deleteObject(itemRef);
         setItems(items?.filter(item => item.fullPath !== itemRef.fullPath));
@@ -184,7 +181,7 @@ export const Workspace = () => {
         <ToastContainer />
         <Navbar onSearch={handleSearch} />
 
-        <WorkspaceView path={path} items={items} prefixes={prefixes} onDelete={handleDelete} />
+        <WorkspaceView path={path} items={items} prefixes={prefixes} onDelete={handleDelete} search={search} />
 
         {/* upload button positioned at bottom-right */}
         <UploadWidget onUpload={handleUpload} onNewFolder={handleNewFolder} />

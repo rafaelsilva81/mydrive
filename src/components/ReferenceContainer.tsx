@@ -11,11 +11,13 @@ import { ImageThumbnail } from './thumbnails/ImageThumbnail';
 import { ReferenceContextMenu } from './menus/ReferenceContextMenu';
 import fileDownload from 'js-file-download'
 import { useNavigate } from 'react-router-dom';
+import parse from 'html-react-parser';
 
 interface Props {
     target: StorageReference
     type: 'item' | 'prefix'
     onDelete: (target: StorageReference, type: string) => void;
+    search?: string
 }
 
 const imageExtensions = ['image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/svg', 'image/webp'];
@@ -91,12 +93,38 @@ export const ReferenceContainer = (props: Props) => {
     const handleClick = (event: FormEvent) => {
         event.preventDefault();
         if (type === 'item') {
-            console.log(encodeURIComponent(downloadData.data))
+            /* console.log(encodeURIComponent(downloadData.data)) */
         } else if (type === 'prefix') {
             /* go to /workspace/:folderId */
             navigate(`/workspace/${target.fullPath}`)
         }
     }
+
+    const [highlightElement, setHighlightElement] = useState<ReactElement>();
+    useEffect(() => {
+        /* Highlight search ignoring if lowercase or uppercase */
+        if (props.search) {
+            const search = props.search.toLowerCase();
+            const name = target.name.toLowerCase();
+            if (name.includes(search)) {
+                const index = name.indexOf(search);
+                const before = target.name.substring(0, index);
+                const after = target.name.substring(index + search.length);
+                setHighlightElement(<>
+                    {before}
+                    <span className="bg-yellow-300">
+                        {/* Highligth with upercase or lowercase depending on original target name */}
+                        {target.name.substring(index, index + search.length)}
+                    </span>
+                    {after}
+                </>)
+            }
+        } else {
+            /* Remove highlight*/
+            setHighlightElement(<>{target.name}</>)
+        }
+    }, [props.search, target.name])
+
 
     const [tooltip, showTooltip] = useState(true);
 
@@ -113,7 +141,9 @@ export const ReferenceContainer = (props: Props) => {
                             setTimeout(() => showTooltip(true), 50);
                         }}>
                         {tooltip && <ReactTooltip effect="solid" delayShow={1000} />}
-                        <p className="truncate text-neutral-100">{target.name}</p>
+                        <p className="truncate text-neutral-100">
+                            {highlightElement ? highlightElement : target.name}
+                        </p>
                     </div>
                 </a>
             </div>

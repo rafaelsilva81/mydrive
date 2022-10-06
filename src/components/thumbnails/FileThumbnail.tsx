@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect, useState } from 'react'
 import {
     File, FileAudio, FileVideo, FilePdf, FileDoc,
-    MicrosoftWordLogo, FileText, FileZip, MicrosoftExcelLogo, MicrosoftPowerpointLogo, 
+    MicrosoftWordLogo, FileText, FileZip, MicrosoftExcelLogo, MicrosoftPowerpointLogo,
     FileCsv, FilePpt, FileCode, FileX
 } from 'phosphor-react'
 import { FileSkeleton } from './FileSkeleton'
@@ -70,7 +70,7 @@ const mimes = [
         name: 'code',
         types: ["text/html", "text/css", "application/x-python-code", "text/x-python", "text/x-java-source", "application/x-javascript", "application/x-php", "text/x-c", "application/json"],
         icon: <FileCode weight='fill' />
-    }, 
+    },
     {
         name: 'executables',
         types: ["application/x-msdownload", "application/x-sh", "application/x-shellscript"],
@@ -85,7 +85,7 @@ export const FileThumbnail = (props: Props) => {
     const [icon, setIcon] = useState<ReactElement>(<File weight='fill' />)
     const { mimeType } = props
 
-    console.log(mimeType)
+    /* console.log(mimeType) */
     /* Get icon based on mimetype */
     useEffect(() => {
         mimes.forEach(mime => {

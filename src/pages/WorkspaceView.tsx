@@ -10,10 +10,11 @@ interface Props {
   items?: StorageReference[]
   prefixes?: StorageReference[]
   onDelete: (target: StorageReference, type: string) => void
+  search?: string
 }
 const WorkspaceView = (props: Props) => {
 
-  const { path, items, prefixes, onDelete } = props;
+  const { path, items, prefixes, onDelete, search } = props;
 
   return (
     <>
@@ -25,10 +26,10 @@ const WorkspaceView = (props: Props) => {
       <div id="files" className="flex mx-4 px-6 mt-2 flex-wrap items-center md:justify-start justify-center">
         {items?.length === 0 && prefixes?.length === 0 && <NoFiles />}
         {prefixes?.map((prefix) => {
-          return <ReferenceContainer onDelete={onDelete} type='prefix' target={prefix} key={prefix.fullPath} />
+          return <ReferenceContainer onDelete={onDelete} search={search} type='prefix' target={prefix} key={prefix.fullPath} />
         })}
         {items?.map((item) => {
-          return <ReferenceContainer onDelete={onDelete} type='item' target={item} key={item.fullPath} />
+          return <ReferenceContainer onDelete={onDelete} search={search} type='item' target={item} key={item.fullPath} />
         })}
       </div>
 
