@@ -23,14 +23,20 @@ export const ReferenceContextMenu = (props: Props) => {
 
     const [target, setTarget] = useState<StorageReference | null>(props.target);
 
+    const [tooltip, showTooltip] = useState(true);
+
     return (
         //Context menu that will be shown when user right clicks on an item
         <div className='absolute z-10' style={{ top: anchor.y, left: anchor.x }}>
             <div className="bg-white shadow rounded-lg p-1 w-48">
 
                 <div className='m-2 p-1'>
-                    <div className="text-teal-600 font-bold truncate" data-tip={name}>
-                        <ReactTooltip delayShow={1000} />
+                    <div className="text-teal-600 font-bold truncate" data-tip={name} onMouseEnter={() => showTooltip(true)}
+                        onMouseLeave={() => {
+                            showTooltip(false);
+                            setTimeout(() => showTooltip(true), 50);
+                        }}>
+                        {tooltip && <ReactTooltip effect="solid" delayShow={1000} />}
                         {name}
                     </div>
                     <hr />

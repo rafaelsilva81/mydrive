@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 interface Props {
     target: StorageReference
     type: 'item' | 'prefix'
-    onDelete:  (target: StorageReference, type: string) => void;
+    onDelete: (target: StorageReference, type: string) => void;
 }
 
 const imageExtensions = ['image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/svg', 'image/webp'];
@@ -98,6 +98,7 @@ export const ReferenceContainer = (props: Props) => {
         }
     }
 
+    const [tooltip, showTooltip] = useState(true);
 
     return (
         <>
@@ -106,8 +107,12 @@ export const ReferenceContainer = (props: Props) => {
                     <div id="thumbnail" className="w-36">
                         {type === 'prefix' ? (<FolderThumbnail />) : thumbnail}
                     </div>
-                    <div className="p-4 bg-teal-500 hover:bg-teal-400 w-36" data-tip={target.name}>
-                        <ReactTooltip delayShow={1000} />
+                    <div className="p-4 bg-teal-500 hover:bg-teal-400 w-36" data-tip={target.name} onMouseEnter={() => showTooltip(true)}
+                        onMouseLeave={() => {
+                            showTooltip(false);
+                            setTimeout(() => showTooltip(true), 50);
+                        }}>
+                        {tooltip && <ReactTooltip effect="solid" delayShow={1000} />}
                         <p className="truncate text-neutral-100">{target.name}</p>
                     </div>
                 </a>
