@@ -48,7 +48,7 @@ const mimes = [
     },
     {
         name: 'compacted',
-        types: ["application/x-tar", "application/vnd.rar", "application/zip", "application/x-7z-compressed", "application/x-zip-compressed"],
+        types: ["application/x-tar", "application/vnd.rar", "application/zip", "application/x-7z-compressed", "application/x-zip-compressed", "application/x-7z-compressed"],
         icon: <FileZip weight='fill' />
     },
     {

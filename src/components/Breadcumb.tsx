@@ -24,12 +24,12 @@ export const Breadcumb = (props: { path: string }) => {
                     const path = pathArray.slice(0, index + 1).join('/');
                     if (index != 0) { /* to not print home */
                         return (
-                            <>
-                                <button key={index} onClick={() => navigate(path)} className="text-teal-500 hover:text-teal-600 disabled:text-gray-500" disabled={currentLocation === location}>
+                            <div key={location}>
+                                <button onClick={() => navigate(path)} className="text-teal-500 hover:text-teal-600 disabled:text-gray-500" disabled={currentLocation === location}>
                                     {location}
                                 </button>
                                 <span className="text-gray-600">/</span>
-                            </>
+                            </div>
                         )
                     }
                 })}
